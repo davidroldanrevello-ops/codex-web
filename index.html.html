@@ -1,0 +1,1326 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Codex - Desarrollo Web Profesional</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ── Reset ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-900:      #0f172a;
+      --bg-800:      #1e293b;
+      --bg-700:      #334155;
+      --bg-600:      #475569;
+      --blue-600:    #2563eb;
+      --blue-700:    #1d4ed8;
+      --blue-400:    #60a5fa;
+      --indigo-600:  #4f46e5;
+      --text-100:    #f1f5f9;
+      --text-300:    #cbd5e1;
+      --text-400:    #94a3b8;
+      --red-900:     #450a0a;
+      --red-100:     #fee2e2;
+      --green-900:   #052e16;
+      --green-100:   #dcfce7;
+      --blue-900:    #0c1a40;
+      --blue-100:    #dbeafe;
+      --success:     #10b981;
+      --danger:      #ef4444;
+      --amber-400:   #fbbf24;
+      --amber-600:   #d97706;
+      --amber-700:   #b45309;
+      --amber-800:   #92400e;
+      --emerald-400: #34d399;
+      --emerald-600: #059669;
+      --emerald-700: #047857;
+      --emerald-800: #065f46;
+      --purple-400:  #c084fc;
+      --purple-600:  #9333ea;
+      --purple-700:  #7e22ce;
+      --purple-800:  #6b21a8;
+      --rose-400:    #fb7185;
+      --rose-600:    #e11d48;
+      --rose-700:    #be123c;
+      --rose-800:    #9f1239;
+      --green-400:   #34d399;
+      --green-600:   #059669;
+      --green-700:   #047857;
+      --red-400:     #f87171;
+      --red-700:     #b91c1c;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background: var(--bg-900);
+      color: var(--text-100);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    input, textarea, button, select { font-family: inherit; }
+
+    .page { display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ══════════════════════════════════════════════════════════
+       HEADER
+    ══════════════════════════════════════════════════════════ */
+    #header {
+      background: var(--bg-800);
+      box-shadow: 0 2px 8px rgba(0,0,0,.4);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      padding: .75rem 1.5rem;
+    }
+
+    .header-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo { display: flex; align-items: center; gap: .75rem; }
+    .logo img { width: 50px; height: 50px; object-fit: contain; }
+    .logo h1  { font-size: 1.5rem; font-weight: 700; }
+
+    nav.desktop { display: flex; gap: 2rem; font-size: 1.05rem; font-weight: 500; }
+    nav.desktop a { transition: color .2s; }
+    nav.desktop a:hover { color: var(--blue-400); }
+    nav.desktop a.active { color: var(--blue-400); border-bottom: 2px solid var(--blue-400); padding-bottom: 2px; }
+
+    #mobile-menu-button {
+      display: none; background: none; border: none;
+      color: var(--text-100); cursor: pointer; padding: .25rem;
+    }
+
+    #mobile-menu { display: none; padding: 1rem 0 .5rem; }
+    #mobile-menu a {
+      display: block; padding: .6rem 0; font-size: 1.1rem;
+      border-bottom: 1px solid var(--bg-700);
+    }
+    #mobile-menu a:hover { color: var(--blue-400); }
+
+    /* Escape Room header bar (shown only when ER is active) */
+    #er-header-bar {
+      display: none;
+      background: rgba(30,41,59,.95);
+      padding: .4rem 1.5rem;
+      border-top: 1px solid var(--bg-700);
+    }
+
+    .er-bar-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .er-timer-label { color: var(--text-300); font-size: .875rem; }
+    #er-timer { font-family: 'Courier New', monospace; font-weight: 700; margin-left: .4rem; }
+
+    .er-progress-wrap { width: 8rem; }
+    .er-progress-label { font-size: .7rem; color: var(--text-300); margin-bottom: .2rem; }
+
+    .progress-bar  { height: 10px; border-radius: 5px; background: var(--bg-700); overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--blue-600); transition: width .5s ease; }
+
+    @media (max-width: 767px) {
+      nav.desktop         { display: none; }
+      #mobile-menu-button { display: block; }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       SECTION TRANSITIONS
+    ══════════════════════════════════════════════════════════ */
+    .section-hidden {
+      opacity: 0; pointer-events: none; transform: translateY(20px);
+      transition: opacity .5s ease, transform .5s ease;
+    }
+    .section-visible {
+      opacity: 1; pointer-events: auto; transform: translateY(0);
+      transition: opacity .5s ease, transform .5s ease;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       CODEX COMPANY SECTIONS
+    ══════════════════════════════════════════════════════════ */
+
+    /* Hero */
+    #hero {
+      background: linear-gradient(135deg, var(--bg-900) 0%, var(--bg-800) 100%);
+      flex-grow: 1; display: flex; align-items: center;
+      justify-content: center; text-align: center; padding: 5rem 1.5rem;
+      animation: fadeInUp .8s ease both;
+    }
+    .hero-inner { max-width: 860px; }
+    #hero h2 {
+      font-size: clamp(2.2rem, 5vw, 3.75rem); font-weight: 800;
+      line-height: 1.15; margin-bottom: 1.25rem;
+    }
+    #hero p { font-size: clamp(1.1rem, 2.5vw, 1.4rem); opacity: .9; margin-bottom: 2.5rem; }
+
+    /* Sections */
+    .section-dark { background: var(--bg-900); padding: 5rem 1.5rem; }
+    .section-mid  { background: var(--bg-800); padding: 5rem 1.5rem; }
+    .container    { max-width: 1280px; margin: 0 auto; }
+
+    .section-title    { font-size: 2.25rem; font-weight: 700; text-align: center; margin-bottom: 1rem; }
+    .section-subtitle { font-size: 1.15rem; text-align: center; opacity: .8; max-width: 680px; margin: 0 auto 4rem; line-height: 1.7; }
+
+    /* Grids */
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; }
+
+    /* Cards */
+    .card {
+      background: var(--bg-800); border-radius: 1rem; padding: 2rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,.2);
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .card:hover { transform: translateY(-6px); box-shadow: 0 16px 32px rgba(0,0,0,.3); }
+    .card-icon {
+      width: 64px; height: 64px; border-radius: 50%; background: var(--blue-600);
+      display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: #fff;
+    }
+    .card h4 { font-size: 1.4rem; font-weight: 700; margin-bottom: .75rem; }
+    .card p  { opacity: .8; line-height: 1.65; }
+
+    /* Benefits */
+    .benefit { text-align: center; }
+    .benefit-icon {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue-600), var(--blue-700));
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.5rem; color: #fff;
+    }
+    .benefit h4 { font-size: 1.4rem; font-weight: 700; margin-bottom: .75rem; }
+    .benefit p  { opacity: .8; line-height: 1.65; }
+
+    /* Contact */
+    #contacto { background: var(--bg-900); padding: 5rem 1.5rem; }
+    .contact-wrap { max-width: 1100px; margin: 0 auto; }
+    .contact-card {
+      background: var(--bg-800); border-radius: 1rem; padding: 2.5rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,.3);
+    }
+    .contact-card h3 { font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 2rem; }
+    .contact-item { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.5rem; }
+    .contact-item svg { flex-shrink: 0; color: var(--blue-400); margin-top: .2rem; }
+    .contact-item h4  { font-size: 1.1rem; font-weight: 600; margin-bottom: .3rem; }
+    .contact-item a   { color: var(--blue-400); }
+    .contact-item a:hover { text-decoration: underline; }
+    .contact-item p   { color: var(--text-300); }
+    .contact-divider  { border-top: 1px solid var(--bg-600); margin-top: 2rem; padding-top: 1.5rem; text-align: center; opacity: .75; line-height: 1.6; }
+
+    /* Form */
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-size: 1rem; font-weight: 500; margin-bottom: .5rem; }
+    .form-group input, .form-group textarea {
+      width: 100%; padding: .75rem 1rem; border-radius: .5rem;
+      background: var(--bg-700); border: 1px solid var(--bg-600);
+      color: var(--text-100); font-size: 1rem; outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      border-color: var(--blue-600); box-shadow: 0 0 0 3px rgba(37,99,235,.25);
+    }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: var(--text-400); }
+    .btn-submit-form {
+      width: 100%; padding: .9rem; border-radius: .5rem; background: var(--blue-600);
+      color: #fff; font-size: 1.05rem; font-weight: 600; cursor: pointer; border: none;
+      transition: background .2s, transform .2s;
+    }
+    .btn-submit-form:hover { background: var(--blue-700); transform: scale(1.02); }
+
+    #form-message { display: none; margin-top: 1rem; padding: 1rem; border-radius: .5rem; font-size: .95rem; }
+    #form-message.error   { background: var(--red-900);   color: var(--red-100); }
+    #form-message.success { background: var(--green-900); color: var(--green-100); }
+    #form-message.info    { background: var(--blue-900);  color: var(--blue-100); }
+
+    /* Buttons shared */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+      cursor: pointer; border: none; font-weight: 600;
+      transition: transform .25s, box-shadow .25s, background .2s; outline: none;
+    }
+    .btn:hover  { transform: scale(1.04); }
+    .btn:active { transform: scale(.97); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    .btn-primary {
+      background: var(--blue-600); color: #fff; padding: 1rem 2.25rem;
+      border-radius: 9999px; font-size: 1.1rem;
+    }
+    .btn-primary:hover { background: var(--blue-700); box-shadow: 0 10px 25px rgba(0,0,0,.35); }
+
+    .btn-back {
+      background: var(--bg-700); color: var(--text-100); padding: .75rem 1.5rem;
+      border-radius: .5rem; font-size: 1rem; margin-bottom: 2rem;
+    }
+    .btn-back:hover { background: var(--bg-600); }
+
+    /* ══════════════════════════════════════════════════════════
+       ESCAPE ROOM SECTION
+    ══════════════════════════════════════════════════════════ */
+    #escape-room-section { background: var(--bg-900); padding: 2.5rem 1rem; flex: 1; }
+    .er-inner { max-width: 72rem; margin: 0 auto; }
+
+    /* Back button (escape room → company) */
+    .er-back-wrap { margin-bottom: 2rem; }
+
+    /* ER Start screen */
+    #er-start-screen { text-align: center; animation: fadeInUp .8s ease both; }
+    .er-start-icon {
+      width: 6rem; height: 6rem; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue-600), var(--indigo-600));
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.5rem; font-size: 2.25rem; color: #fff;
+    }
+    .typewriter-h1 {
+      overflow: hidden; border-right: .15em solid var(--blue-600);
+      white-space: nowrap; margin: 0 auto .5rem; letter-spacing: .1em;
+      font-size: clamp(2rem, 5vw, 3rem); font-weight: 800;
+      animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+    }
+    .er-intro-card {
+      max-width: 48rem; margin: 0 auto 3rem; border-radius: 1rem;
+      padding: 2rem; background: rgba(30,41,59,.75);
+      border: 1px solid var(--bg-600); box-shadow: 0 20px 40px rgba(0,0,0,.3);
+    }
+    .topic-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 1.5rem;
+    }
+    @media (max-width: 600px) { .topic-grid { grid-template-columns: repeat(3, 1fr); } }
+    .topic-item { text-align: center; padding: .75rem .5rem; background: rgba(15,23,42,.5); border-radius: .75rem; }
+    .topic-item i { font-size: 1.4rem; display: block; margin-bottom: .4rem; }
+    .topic-item p { font-size: .8rem; font-weight: 600; }
+
+    #er-player-name {
+      padding: .6rem 1rem; border-radius: .5rem; background: var(--bg-800);
+      border: 1px solid var(--bg-600); color: var(--text-100); text-align: center;
+      width: 16rem; font-size: 1rem; outline: none; transition: border-color .2s;
+    }
+    #er-player-name:focus { border-color: var(--blue-600); }
+    #er-player-name::placeholder { color: var(--text-400); }
+
+    .btn-er-start {
+      background: linear-gradient(135deg, var(--blue-600), var(--indigo-600));
+      color: #fff; padding: 1rem 2.5rem; border-radius: 9999px; font-size: 1.2rem;
+      animation: pulse 2s infinite;
+    }
+    .btn-er-start:hover { background: linear-gradient(135deg, var(--blue-700), #4338ca); }
+
+    /* ER Levels */
+    .er-levels-header { text-align: center; margin-bottom: 3rem; }
+    .er-levels-header h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; margin-bottom: 1rem; }
+    .er-hint { font-size: .875rem; color: var(--text-400); margin-top: .75rem; }
+
+    .rooms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 1.5rem; }
+
+    .room-card {
+      border-radius: 1rem; padding: 1.5rem; background: var(--bg-800);
+      box-shadow: 0 8px 24px rgba(0,0,0,.3); border-width: 2px; border-style: solid;
+      transition: transform .3s, box-shadow .3s; text-align: center;
+    }
+    .room-card:hover { transform: translateY(-5px); box-shadow: 0 16px 32px rgba(0,0,0,.4); }
+    .room-card.locked { filter: grayscale(.8); opacity: .7; pointer-events: none; }
+    .room-card.completed { position: relative; }
+    .room-card.completed::after {
+      content: "✓"; position: absolute; top: -10px; right: -10px;
+      background: var(--success); color: #fff; width: 25px; height: 25px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    .room-card-icon {
+      width: 4rem; height: 4rem; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem; color: #fff; font-size: 1.5rem;
+    }
+    .room-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: .35rem; }
+    .room-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: .35rem; }
+    .room-card p  { font-size: .85rem; color: var(--text-300); margin-bottom: 1rem; }
+    .room-difficulty { font-size: .8rem; color: var(--text-400); margin-bottom: .25rem; }
+    .room-questions  { font-size: .8rem; color: var(--text-400); margin-bottom: 1.5rem; }
+
+    .border-amber   { border-color: rgba(245,158,11,.35); }
+    .border-emerald { border-color: rgba(16,185,129,.35); }
+    .border-purple  { border-color: rgba(147,51,234,.35); }
+    .border-rose    { border-color: rgba(244,63,94,.35); }
+    .border-blue-er { border-color: rgba(37,99,235,.35); }
+
+    /* ER Room screen */
+    .er-room-top {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+    }
+    .er-room-badge {
+      font-size: .875rem; padding: .3rem .8rem; border-radius: 9999px; background: var(--bg-700); margin-left: 1rem;
+    }
+    #er-room-content { max-width: 56rem; margin: 0 auto; }
+
+    /* Question cards */
+    .question-card {
+      border-radius: .75rem; padding: 1.5rem; background: rgba(30,41,59,.55);
+      border: 1px solid var(--bg-700); border-left: 4px solid transparent;
+      transition: all .3s; margin-bottom: 1.5rem;
+    }
+    .question-card.correct   { border-left-color: var(--success); background: rgba(16,185,129,.08); border-color: var(--green-700); }
+    .question-card.incorrect { border-left-color: var(--danger);  background: rgba(239,68,68,.08);  border-color: var(--red-700); }
+    .question-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .question-top h4 { font-size: 1.1rem; font-weight: 700; }
+    .q-badge { font-size: .8rem; font-weight: 600; padding: .25rem .75rem; border-radius: 9999px; }
+    .q-badge-pending  { background: var(--bg-700); }
+    .q-badge-correct  { background: rgba(16,185,129,.2); color: #86efac; }
+    .q-badge-incorrect{ background: rgba(239,68,68,.2);  color: #fca5a5; }
+    .question-text { font-size: 1.05rem; margin-bottom: 1rem; }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-bottom: 1rem; }
+    @media (max-width: 500px) { .options-grid { grid-template-columns: 1fr; } }
+    .option-label { cursor: pointer; }
+    .option-box {
+      border-radius: .5rem; padding: 1rem; background: rgba(15,23,42,.5);
+      border: 1px solid var(--bg-600); transition: background .2s;
+      display: flex; align-items: center; gap: .75rem; font-size: .95rem;
+    }
+    .option-box:hover { background: rgba(51,65,85,.5); }
+    .option-correct { border: 2px solid var(--success); }
+    .option-wrong   { border: 2px solid var(--danger); }
+    .explanation-box { margin-top: 1rem; padding: 1rem; border-radius: .5rem; font-size: .9rem; }
+    .expl-title { font-weight: 600; margin-bottom: .25rem; }
+    .expl-body  { color: var(--text-300); }
+
+    /* ER Final screen */
+    #er-final-screen { text-align: center; }
+    .trophy-icon {
+      width: 8rem; height: 8rem; border-radius: 50%;
+      background: linear-gradient(135deg, var(--green-600), var(--emerald-700));
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.5rem; font-size: 3.5rem; color: #fff;
+    }
+    .results-card {
+      max-width: 48rem; margin: 0 auto 3rem; border-radius: 1rem;
+      padding: 2rem; background: rgba(30,41,59,.75);
+      border: 1px solid var(--green-700); box-shadow: 0 20px 40px rgba(0,0,0,.3);
+    }
+    .results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+    @media (max-width: 500px) { .results-grid { grid-template-columns: 1fr; } }
+    .result-stat { text-align: left; padding: 1rem; background: rgba(15,23,42,.5); border-radius: .75rem; }
+    .result-stat h3 { font-size: 1rem; font-weight: 700; margin-bottom: .75rem; }
+    .result-stat p  { font-size: 1.75rem; font-weight: 700; font-family: 'Courier New', monospace; }
+
+    /* ER color helpers */
+    .btn-color-amber   { background: linear-gradient(135deg,var(--amber-600),var(--amber-700));   color:#fff; padding:.65rem 1.5rem; border-radius:.5rem; width:100%; }
+    .btn-color-emerald { background: linear-gradient(135deg,var(--emerald-600),var(--emerald-700));color:#fff; padding:.65rem 1.5rem; border-radius:.5rem; width:100%; }
+    .btn-color-purple  { background: linear-gradient(135deg,var(--purple-600),var(--purple-700)); color:#fff; padding:.65rem 1.5rem; border-radius:.5rem; width:100%; }
+    .btn-color-rose    { background: linear-gradient(135deg,var(--rose-600),var(--rose-700));     color:#fff; padding:.65rem 1.5rem; border-radius:.5rem; width:100%; }
+    .btn-color-blue    { background: linear-gradient(135deg,var(--blue-600),var(--blue-700));     color:#fff; padding:.65rem 1.5rem; border-radius:.5rem; width:100%; }
+
+    .icon-bg-amber   { background: linear-gradient(135deg,var(--amber-600),var(--amber-800)); }
+    .icon-bg-emerald { background: linear-gradient(135deg,var(--emerald-600),var(--emerald-800)); }
+    .icon-bg-purple  { background: linear-gradient(135deg,var(--purple-600),var(--purple-800)); }
+    .icon-bg-rose    { background: linear-gradient(135deg,var(--rose-600),var(--rose-800)); }
+    .icon-bg-blue    { background: linear-gradient(135deg,var(--blue-600),#1e3a8a); }
+
+    .text-color-amber   { color: var(--amber-400); }
+    .text-color-emerald { color: var(--emerald-400); }
+    .text-color-purple  { color: var(--purple-400); }
+    .text-color-rose    { color: var(--rose-400); }
+    .text-color-blue    { color: var(--blue-400); }
+
+    .expl-amber   { background: rgba(180,83,9,.15); border:1px solid var(--amber-700); }
+    .expl-emerald { background: rgba(5,150,105,.15); border:1px solid var(--emerald-700); }
+    .expl-purple  { background: rgba(126,34,206,.15); border:1px solid var(--purple-700); }
+    .expl-rose    { background: rgba(190,18,60,.15); border:1px solid var(--rose-700); }
+    .expl-blue    { background: rgba(29,78,216,.15); border:1px solid var(--blue-700); }
+
+    .expl-amber   .expl-title { color: #fcd34d; }
+    .expl-emerald .expl-title { color: #6ee7b7; }
+    .expl-purple  .expl-title { color: #d8b4fe; }
+    .expl-rose    .expl-title { color: #fda4af; }
+    .expl-blue    .expl-title { color: #93c5fd; }
+
+    /* Btn ER generic */
+    .btn-slate-er {
+      background: var(--bg-700); color: var(--text-100); padding: .65rem 1.25rem;
+      border-radius: .5rem; font-size: .95rem;
+    }
+    .btn-slate-er:hover { background: var(--bg-600); }
+
+    .btn-blue-er {
+      background: linear-gradient(135deg, var(--blue-600), var(--blue-700));
+      color: #fff; padding: .75rem 2rem; border-radius: .5rem; font-size: 1rem;
+    }
+    .btn-restart-er {
+      background: linear-gradient(135deg, var(--blue-600), var(--indigo-600));
+      color: #fff; padding: .75rem 2rem; border-radius: 9999px; font-size: 1rem;
+    }
+    .btn-cert-er {
+      background: linear-gradient(135deg, var(--green-600), var(--emerald-700));
+      color: #fff; padding: .75rem 2rem; border-radius: 9999px; font-size: 1rem;
+    }
+    .btn-amber-er {
+      background: linear-gradient(135deg, var(--amber-600), var(--amber-700));
+      color: #fff; padding: .65rem 1.25rem; border-radius: .5rem; font-size: .95rem;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       MODALS
+    ══════════════════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.75);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 500; padding: 1rem;
+    }
+    .modal-overlay.hidden { display: none !important; }
+    .modal-box {
+      background: var(--bg-800); border-radius: 1rem; padding: 2rem;
+      max-width: 32rem; width: 100%; box-shadow: 0 25px 50px rgba(0,0,0,.5);
+      border: 1px solid var(--bg-600);
+    }
+    .modal-icon { font-size: 3rem; text-align: center; margin-bottom: 1rem; }
+
+    .cert-box {
+      background: linear-gradient(135deg, var(--bg-900), var(--bg-800));
+      border-radius: 1rem; padding: 2rem; max-width: 42rem; width: 100%;
+      border: 1px solid var(--amber-700); box-shadow: 0 25px 50px rgba(0,0,0,.5);
+    }
+    .cert-icon {
+      width: 5rem; height: 5rem; border-radius: 50%;
+      background: linear-gradient(135deg, var(--amber-600), var(--amber-800));
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem; font-size: 2.5rem; color: #fff;
+    }
+    .cert-body {
+      background: rgba(15,23,42,.5); border-radius: .75rem;
+      padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid var(--bg-700);
+    }
+    .cert-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; margin: 1rem 0; }
+    .cert-badge  { padding: .25rem .75rem; border-radius: 9999px; font-size: .875rem; border: 1px solid; }
+    .cert-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 1.5rem; border-top: 1px solid var(--bg-700); flex-wrap: wrap; gap: 1rem;
+    }
+    .cert-sig { text-align: center; }
+    .cert-sig .line { margin-bottom: .5rem; }
+    .cert-sig p { font-size: .875rem; }
+
+    /* ══════════════════════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════════════════════ */
+    #footer {
+      background: var(--bg-800); text-align: center;
+      padding: 2rem 1.5rem; opacity: .7; font-size: .95rem;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ANIMATIONS
+    ══════════════════════════════════════════════════════════ */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes typing {
+      from { width: 0 }
+      to   { width: 100% }
+    }
+    @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: var(--blue-600) }
+    }
+    @keyframes pulse {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%,30%,50%,70%,90% { transform: translateX(-5px); }
+      20%,40%,60%,80%     { transform: translateX(5px); }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ═══════════════════════════ HEADER ═══════════════════════════ -->
+  <header id="header">
+    <div class="header-inner">
+      <div class="logo">
+        <img src="https://i.imgur.com/h9ZXsUT.png" alt="Codex Logo" onerror="this.style.display='none';" />
+        <h1>Codex</h1>
+      </div>
+
+      <nav class="desktop">
+        <a href="#servicios">Servicios</a>
+        <a href="#porque-codex">¿Por qué Codex?</a>
+        <a href="#escape-room" id="nav-er-link">
+          <i class="fas fa-lock" style="margin-right:.35rem;font-size:.9rem"></i>Escape Room
+        </a>
+        <a href="#contacto" id="contacto-link">Contacto</a>
+      </nav>
+
+      <button id="mobile-menu-button" aria-label="Abrir menú">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12h18M3 6h18M3 18h18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="mobile-menu">
+      <div style="max-width:1280px;margin:0 auto;">
+        <a href="#servicios">Servicios</a>
+        <a href="#porque-codex">¿Por qué Codex?</a>
+        <a href="#escape-room">
+          <i class="fas fa-lock" style="margin-right:.35rem;font-size:.9rem"></i>Escape Room
+        </a>
+        <a href="#contacto">Contacto</a>
+      </div>
+    </div>
+
+    <!-- Barra de escape room (timer + progreso, visible solo en el juego) -->
+    <div id="er-header-bar">
+      <div class="er-bar-inner">
+        <div>
+          <span class="er-timer-label">Tiempo:</span>
+          <span id="er-timer">20:00</span>
+        </div>
+        <div class="er-progress-wrap">
+          <div class="er-progress-label">Progreso</div>
+          <div class="progress-bar">
+            <div id="er-progress-fill" class="progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════ SECCIONES EMPRESA ════════════════════════ -->
+
+  <!-- Hero -->
+  <section id="hero">
+    <div class="hero-inner">
+      <h2>Transformamos ideas en experiencias digitales</h2>
+      <p>Desarrollo web profesional para impulsar tu negocio</p>
+      <button id="cta-button" class="btn btn-primary">Más Información</button>
+    </div>
+  </section>
+
+  <!-- Servicios -->
+  <section id="servicios" class="section-dark">
+    <div class="container">
+      <h3 class="section-title">Nuestros Servicios</h3>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <path d="M4 8H28M4 16H28M4 24H28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h4>Desarrollo Web</h4>
+          <p>Creamos sitios web modernos, rápidos y optimizados para SEO, diseñados para ofrecer la mejor experiencia de usuario en todos los dispositivos.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect x="6" y="6" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2.5"/>
+              <path d="M6 12H26M16 12V26" stroke="currentColor" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <h4>Aplicaciones Web</h4>
+          <p>Desarrollamos aplicaciones web personalizadas con tecnologías modernas, funcionalidades avanzadas y excelente rendimiento.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <path d="M8 12L16 6L24 12M8 12V24C8 25.1 8.9 26 10 26H22C23.1 26 24 25.1 24 24V12M8 12L4 15M24 12L28 15"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h4>E-commerce</h4>
+          <p>Implementamos tiendas online completas con sistemas de pago seguros, gestión de inventario y diseño optimizado para conversión.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ¿Por qué Codex? -->
+  <section id="porque-codex" class="section-mid">
+    <div class="container">
+      <h3 class="section-title">¿Por qué elegir Codex?</h3>
+      <p class="section-subtitle">Nos diferenciamos por nuestro enfoque centrado en el cliente y nuestra dedicación a ofrecer soluciones que realmente funcionan.</p>
+      <div class="grid-3">
+        <div class="benefit">
+          <div class="benefit-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h4>Seguridad Garantizada</h4>
+          <p>Implementamos las mejores prácticas de seguridad para proteger tu sitio y los datos de tus clientes, con certificados SSL y protocolos de encriptación.</p>
+        </div>
+        <div class="benefit">
+          <div class="benefit-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <h4>Entrega Rápida</h4>
+          <p>Nuestro proceso eficiente nos permite entregar proyectos en plazos optimizados sin comprometer la calidad, para que puedas lanzar tu web lo antes posible.</p>
+        </div>
+        <div class="benefit">
+          <div class="benefit-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <h4>Soporte Continuo</h4>
+          <p>No te dejamos solo después del lanzamiento. Ofrecemos soporte técnico y mantenimiento continuo para asegurar que tu web funcione perfectamente siempre.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contacto -->
+  <section id="contacto">
+    <div class="contact-wrap">
+      <button id="back-button" class="btn btn-back">← Volver al Inicio</button>
+      <div class="grid-2">
+        <div class="contact-card">
+          <h3>Contáctanos</h3>
+          <div class="contact-item">
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+              <path d="M4 8L16 18L28 8M4 8V24C4 25.1 4.9 26 6 26H26C27.1 26 28 25.1 28 24V8M4 8C4 6.9 4.9 6 6 6H26C27.1 6 28 6.9 28 8"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div><h4>Email</h4><a href="mailto:contacto@codexdev.es">contacto@codexdev.es</a></div>
+          </div>
+          <div class="contact-item">
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+              <path d="M8 4C6.9 4 6 4.9 6 6V26C6 27.1 6.9 28 8 28H24C25.1 28 26 27.1 26 26V6C26 4.9 25.1 4 24 4H8ZM16 24C15.45 24 15 23.55 15 23C15 22.45 15.45 22 16 22C16.55 22 17 22.45 17 23C17 23.55 16.55 24 16 24Z"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div><h4>Teléfono</h4><a href="tel:+34917654321">+34 917 654 321</a></div>
+          </div>
+          <div class="contact-item">
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+              <path d="M16 4C11.6 4 8 7.6 8 12C8 18 16 28 16 28C16 28 24 18 24 12C24 7.6 20.4 4 16 4ZM16 15C14.3 15 13 13.7 13 12C13 10.3 14.3 9 16 9C17.7 9 19 10.3 19 12C19 13.7 17.7 15 16 15Z"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div><h4>Ubicación</h4><p>Córdoba, España</p></div>
+          </div>
+          <div class="contact-divider">Estamos aquí para ayudarte a llevar tu proyecto al siguiente nivel</div>
+        </div>
+        <div class="contact-card">
+          <h3>Envíanos un mensaje</h3>
+          <form id="contact-form">
+            <div class="form-group"><label for="name">Nombre</label><input type="text" id="name" name="name" placeholder="Tu nombre" required /></div>
+            <div class="form-group"><label for="email">Email</label><input type="email" id="email" name="email" placeholder="tu@email.com" required /></div>
+            <div class="form-group"><label for="subject">Asunto</label><input type="text" id="subject" name="subject" placeholder="Asunto del mensaje" required /></div>
+            <div class="form-group">
+              <label for="message">Mensaje</label>
+              <textarea id="message" name="message" rows="5" placeholder="Tu mensaje..." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit-form">Enviar Mensaje</button>
+          </form>
+          <div id="form-message"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ ESCAPE ROOM SECTION ══════════════════════ -->
+  <section id="escape-room-section">
+    <div class="er-inner">
+
+      <!-- Botón volver a empresa -->
+      <div class="er-back-wrap">
+        <button id="er-back-to-company" class="btn btn-back">
+          ← Volver a Codex
+        </button>
+      </div>
+
+      <!-- Pantalla inicio ER -->
+      <div id="er-start-screen" style="text-align:center">
+        <div style="margin-bottom:2rem">
+          <div class="er-start-icon"><i class="fas fa-lock"></i></div>
+          <h1 class="typewriter-h1">Codex Escape Room</h1>
+          <p style="font-size:1.2rem;opacity:.9;margin-bottom:2rem">Desbloquea el Sistema - Edición Educativa</p>
+        </div>
+
+        <div class="er-intro-card">
+          <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:1.5rem">¡Bienvenido a Codex!</h2>
+          <p style="font-size:1.05rem;margin-bottom:1.5rem">
+            Has sido seleccionado para unirte al equipo. Para acceder al sistema interno, debes demostrar tus conocimientos resolviendo desafíos de diferentes áreas técnicas.
+          </p>
+          <div class="topic-grid">
+            <div class="topic-item"><i class="fas fa-calculator" style="color:var(--amber-400)"></i><p>Matemáticas</p></div>
+            <div class="topic-item"><i class="fas fa-network-wired" style="color:var(--emerald-400)"></i><p>Redes</p></div>
+            <div class="topic-item"><i class="fas fa-tasks" style="color:var(--purple-400)"></i><p>Proyectos</p></div>
+            <div class="topic-item"><i class="fas fa-landmark" style="color:var(--rose-400)"></i><p>Historia</p></div>
+            <div class="topic-item"><i class="fas fa-laptop-code" style="color:var(--blue-400)"></i><p>Equipos</p></div>
+          </div>
+          <p style="font-size:1.05rem">Tienes <strong style="color:var(--rose-400)">20 minutos</strong> para completar las 5 salas. ¡Demuestra lo que sabes!</p>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:center;gap:1rem">
+          <button id="er-start-button" class="btn btn-er-start">
+            <i class="fas fa-play" style="margin-right:.5rem"></i> Comenzar Escape Room
+          </button>
+          <div>
+            <label for="er-player-name" style="display:block;font-size:.875rem;margin-bottom:.5rem">Introduce tu nombre:</label>
+            <input type="text" id="er-player-name" placeholder="Tu nombre aquí" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Pantalla niveles ER -->
+      <div id="er-levels-screen" style="display:none">
+        <div class="er-levels-header">
+          <h2>Salas del Desafío</h2>
+          <p style="font-size:1.1rem;opacity:.8">Completa cada sala para desbloquear la siguiente</p>
+          <p class="er-hint"><i class="fas fa-info-circle" style="margin-right:.4rem"></i>Cada sala tiene 5 preguntas. Necesitas al menos 4 correctas para avanzar.</p>
+        </div>
+
+        <div class="rooms-grid">
+          <div id="er-room-1" class="room-card border-amber">
+            <div class="room-card-icon icon-bg-amber"><i class="fas fa-calculator"></i></div>
+            <h3 class="text-color-amber">Sala 1</h3>
+            <h4>Matemáticas</h4>
+            <p>Operaciones básicas</p>
+            <div class="room-difficulty">Dificultad: <span class="text-color-amber">Fácil</span></div>
+            <div class="room-questions">Preguntas: <span class="text-color-amber">5</span></div>
+            <button data-room="1" class="er-room-btn btn btn-color-amber"><i class="fas fa-door-open" style="margin-right:.35rem"></i> Entrar</button>
+          </div>
+          <div id="er-room-2" class="room-card border-emerald locked">
+            <div class="room-card-icon icon-bg-emerald"><i class="fas fa-network-wired"></i></div>
+            <h3 class="text-color-emerald">Sala 2</h3>
+            <h4>Redes</h4>
+            <p>Conceptos básicos</p>
+            <div class="room-difficulty">Dificultad: <span class="text-color-emerald">Fácil</span></div>
+            <div class="room-questions">Preguntas: <span class="text-color-emerald">5</span></div>
+            <button data-room="2" class="er-room-btn btn btn-slate-er" disabled><i class="fas fa-lock" style="margin-right:.35rem"></i> Bloqueada</button>
+          </div>
+          <div id="er-room-3" class="room-card border-purple locked">
+            <div class="room-card-icon icon-bg-purple"><i class="fas fa-tasks"></i></div>
+            <h3 class="text-color-purple">Sala 3</h3>
+            <h4>Proyectos</h4>
+            <p>Gestión básica</p>
+            <div class="room-difficulty">Dificultad: <span class="text-color-purple">Fácil</span></div>
+            <div class="room-questions">Preguntas: <span class="text-color-purple">5</span></div>
+            <button data-room="3" class="er-room-btn btn btn-slate-er" disabled><i class="fas fa-lock" style="margin-right:.35rem"></i> Bloqueada</button>
+          </div>
+          <div id="er-room-4" class="room-card border-rose locked">
+            <div class="room-card-icon icon-bg-rose"><i class="fas fa-landmark"></i></div>
+            <h3 class="text-color-rose">Sala 4</h3>
+            <h4>Historia</h4>
+            <p>Cultura general</p>
+            <div class="room-difficulty">Dificultad: <span class="text-color-rose">Fácil</span></div>
+            <div class="room-questions">Preguntas: <span class="text-color-rose">5</span></div>
+            <button data-room="4" class="er-room-btn btn btn-slate-er" disabled><i class="fas fa-lock" style="margin-right:.35rem"></i> Bloqueada</button>
+          </div>
+          <div id="er-room-5" class="room-card border-blue-er locked">
+            <div class="room-card-icon icon-bg-blue"><i class="fas fa-laptop-code"></i></div>
+            <h3 class="text-color-blue">Sala 5</h3>
+            <h4>Equipos</h4>
+            <p>Tecnología básica</p>
+            <div class="room-difficulty">Dificultad: <span class="text-color-blue">Fácil</span></div>
+            <div class="room-questions">Preguntas: <span class="text-color-blue">5</span></div>
+            <button data-room="5" class="er-room-btn btn btn-slate-er" disabled><i class="fas fa-lock" style="margin-right:.35rem"></i> Bloqueada</button>
+          </div>
+        </div>
+
+        <div style="margin-top:3rem;text-align:center">
+          <button id="er-back-to-start" class="btn btn-slate-er">
+            <i class="fas fa-home" style="margin-right:.4rem"></i> Volver al Inicio del Juego
+          </button>
+        </div>
+      </div>
+
+      <!-- Pantalla sala individual ER -->
+      <div id="er-room-screen" style="display:none">
+        <div class="er-room-top">
+          <button id="er-back-to-rooms" class="btn btn-slate-er">
+            <i class="fas fa-arrow-left" style="margin-right:.4rem"></i> Volver a Salas
+          </button>
+          <div style="display:flex;align-items:center;flex-wrap:wrap;gap:.5rem">
+            <span id="er-current-room-title" style="font-size:1.2rem;font-weight:700"></span>
+            <span class="er-room-badge">Preguntas: <span id="er-questions-count">0</span>/5</span>
+          </div>
+        </div>
+        <div id="er-room-content"></div>
+        <div style="margin-top:2rem;text-align:center">
+          <button id="er-submit-room" class="btn btn-blue-er" disabled>
+            <i class="fas fa-check-circle" style="margin-right:.4rem"></i> Completar Sala
+          </button>
+        </div>
+      </div>
+
+      <!-- Pantalla final ER -->
+      <div id="er-final-screen" style="display:none;text-align:center">
+        <div style="margin-bottom:2rem">
+          <div class="trophy-icon"><i class="fas fa-trophy"></i></div>
+          <h1 style="font-size:clamp(2.5rem,6vw,3.5rem);font-weight:800;color:var(--green-400);margin-bottom:1rem">¡Felicidades!</h1>
+          <p style="font-size:1.4rem;margin-bottom:2rem">Has completado el Escape Room de Codex</p>
+        </div>
+        <div class="results-card">
+          <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:1.5rem">Resumen de Resultados</h2>
+          <div class="results-grid">
+            <div class="result-stat">
+              <h3 style="color:var(--green-400)"><i class="fas fa-clock" style="margin-right:.4rem"></i>Tiempo Final</h3>
+              <p id="er-final-time" style="font-family:'Courier New',monospace">--:--</p>
+            </div>
+            <div class="result-stat">
+              <h3 style="color:var(--blue-400)"><i class="fas fa-star" style="margin-right:.4rem"></i>Puntuación</h3>
+              <p id="er-final-score">0/100</p>
+            </div>
+            <div class="result-stat">
+              <h3 style="color:var(--amber-400)"><i class="fas fa-check-circle" style="margin-right:.4rem"></i>Salas</h3>
+              <p id="er-final-rooms">0/5</p>
+            </div>
+          </div>
+          <p style="font-size:1.05rem;margin-bottom:1rem">
+            Has demostrado conocimientos en
+            <strong style="color:var(--amber-400)">Matemáticas</strong>,
+            <strong style="color:var(--emerald-400)">Redes</strong>,
+            <strong style="color:var(--purple-400)">Proyectos</strong>,
+            <strong style="color:var(--rose-400)">Historia</strong> y
+            <strong style="color:var(--blue-400)">Equipos</strong>.
+          </p>
+          <p style="font-size:1.05rem">
+            Ahora estás listo para comenzar a trabajar en <strong style="color:var(--blue-400)">Codex</strong>.
+          </p>
+        </div>
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+          <button id="er-restart-button" class="btn btn-restart-er">
+            <i class="fas fa-redo" style="margin-right:.4rem"></i> Jugar Otra Vez
+          </button>
+          <button id="er-certificate-button" class="btn btn-cert-er">
+            <i class="fas fa-award" style="margin-right:.4rem"></i> Obtener Certificado
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="footer">
+    <p>© 2025 Codex. Todos los derechos reservados.</p>
+  </footer>
+</div>
+
+<!-- Modal resultado sala -->
+<div id="er-result-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div id="er-result-icon" class="modal-icon"></div>
+    <h3 id="er-result-title" style="font-size:1.5rem;font-weight:700;text-align:center;margin-bottom:1rem"></h3>
+    <p id="er-result-message" style="font-size:1.05rem;text-align:center;margin-bottom:1.5rem"></p>
+    <div style="text-align:center">
+      <button id="er-close-result-modal" class="btn btn-blue-er">Continuar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal certificado -->
+<div id="er-certificate-modal" class="modal-overlay hidden">
+  <div class="cert-box">
+    <div style="text-align:center;margin-bottom:2rem">
+      <div class="cert-icon"><i class="fas fa-award"></i></div>
+      <h2 style="font-size:1.75rem;font-weight:700;color:var(--amber-400)">Certificado de Completación</h2>
+      <p style="opacity:.8">Codex Escape Room - Desbloquea el Sistema</p>
+    </div>
+    <div class="cert-body">
+      <p style="text-align:center;font-size:1.1rem;margin-bottom:1rem">Se otorga a</p>
+      <h3 id="er-certificate-name" style="font-size:2rem;font-weight:700;text-align:center;color:#93c5fd;margin-bottom:1.5rem">[Nombre del Jugador]</h3>
+      <p style="text-align:center;font-size:1.05rem;margin-bottom:.75rem">por haber completado exitosamente las 5 salas del desafío:</p>
+      <div class="cert-badges">
+        <span class="cert-badge" style="background:rgba(180,83,9,.2);color:#fcd34d;border-color:var(--amber-700)">Matemáticas</span>
+        <span class="cert-badge" style="background:rgba(5,150,105,.2);color:#6ee7b7;border-color:var(--emerald-700)">Redes</span>
+        <span class="cert-badge" style="background:rgba(126,34,206,.2);color:#d8b4fe;border-color:var(--purple-700)">Proyectos</span>
+        <span class="cert-badge" style="background:rgba(190,18,60,.2);color:#fda4af;border-color:var(--rose-700)">Historia</span>
+        <span class="cert-badge" style="background:rgba(29,78,216,.2);color:#93c5fd;border-color:var(--blue-700)">Equipos</span>
+      </div>
+      <p style="text-align:center;font-size:.95rem">Demostrando conocimientos básicos en áreas técnicas para el desarrollo web profesional.</p>
+    </div>
+    <div class="cert-footer">
+      <div class="cert-sig"><div class="line">_______________________</div><p>Director de Codex</p></div>
+      <div class="cert-sig"><p id="er-certificate-date" style="font-size:1.05rem"></p><p style="opacity:.8">Fecha de completación</p></div>
+      <div class="cert-sig"><div class="line">_______________________</div><p>Instructor del Escape Room</p></div>
+    </div>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem">
+      <button id="er-print-certificate" class="btn btn-amber-er"><i class="fas fa-print" style="margin-right:.4rem"></i> Imprimir</button>
+      <button id="er-close-certificate" class="btn btn-slate-er">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  /* ════════════════════════════════════════════════════
+     NAVEGACIÓN EMPRESA
+  ════════════════════════════════════════════════════ */
+  var hero      = document.getElementById('hero');
+  var servicios = document.getElementById('servicios');
+  var porque    = document.getElementById('porque-codex');
+  var contacto  = document.getElementById('contacto');
+  var erSection = document.getElementById('escape-room-section');
+  var footer    = document.getElementById('footer');
+
+  var mainSections  = [hero, servicios, porque];
+  var allCompany    = [hero, servicios, porque, contacto];
+
+  /* Estado inicial */
+  contacto.style.display   = 'none';
+  contacto.classList.add('section-hidden');
+  erSection.style.display  = 'none';
+
+  function showCompanyMain() {
+    erSection.style.display  = 'none';
+    contacto.style.display   = 'none';
+    document.getElementById('er-header-bar').style.display = 'none';
+    contacto.classList.remove('section-visible');
+    contacto.classList.add('section-hidden');
+    mainSections.forEach(function (s) { s.style.display = ''; });
+    footer.style.display = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function showContact() {
+    mainSections.forEach(function (s) { s.style.display = 'none'; });
+    erSection.style.display = 'none';
+    document.getElementById('er-header-bar').style.display = 'none';
+
+    contacto.style.display = 'block';
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        contacto.classList.remove('section-hidden');
+        contacto.classList.add('section-visible');
+      });
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function showEscapeRoom() {
+    mainSections.forEach(function (s) { s.style.display = 'none'; });
+    contacto.style.display  = 'none';
+    contacto.classList.remove('section-visible');
+    contacto.classList.add('section-hidden');
+    footer.style.display    = 'none';
+    erSection.style.display = 'block';
+    document.getElementById('er-header-bar').style.display = erGameStarted ? 'block' : 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* Nav desktop */
+  document.getElementById('contacto-link').addEventListener('click', function (e) { e.preventDefault(); showContact(); });
+  document.getElementById('nav-er-link').addEventListener('click', function (e) { e.preventDefault(); showEscapeRoom(); });
+  document.getElementById('back-button').addEventListener('click', function (e) { e.preventDefault(); showCompanyMain(); });
+  document.getElementById('er-back-to-company').addEventListener('click', function () { showCompanyMain(); });
+
+  /* CTA button */
+  document.getElementById('cta-button').addEventListener('click', function () {
+    servicios.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  /* Mobile menu */
+  var menuBtn    = document.getElementById('mobile-menu-button');
+  var mobileMenu = document.getElementById('mobile-menu');
+  menuBtn.addEventListener('click', function () {
+    mobileMenu.style.display = mobileMenu.style.display === 'block' ? 'none' : 'block';
+  });
+  mobileMenu.querySelectorAll('a').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      mobileMenu.style.display = 'none';
+      var href = this.getAttribute('href');
+      if (href === '#contacto') { e.preventDefault(); showContact(); }
+      if (href === '#escape-room') { e.preventDefault(); showEscapeRoom(); }
+    });
+  });
+
+  /* Formulario contacto */
+  var form    = document.getElementById('contact-form');
+  var formMsg = document.getElementById('form-message');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var n = form.name.value.trim(), em = form.email.value.trim(),
+        s = form.subject.value.trim(), m = form.message.value.trim();
+    if (!n || !em || !s || !m) { showFormMsg('Por favor, completa todos los campos.', 'error'); return; }
+    showFormMsg('Enviando mensaje…', 'info');
+    setTimeout(function () { showFormMsg('¡Mensaje enviado con éxito! Te contactaremos pronto.', 'success'); form.reset(); }, 1500);
+  });
+  function showFormMsg(text, type) {
+    formMsg.textContent = text; formMsg.className = type; formMsg.style.display = 'block';
+    clearTimeout(formMsg._t);
+    formMsg._t = setTimeout(function () { formMsg.style.display = 'none'; }, 5000);
+  }
+
+  /* ════════════════════════════════════════════════════
+     ESCAPE ROOM GAME LOGIC
+  ════════════════════════════════════════════════════ */
+  var erCurrentRoom    = 1;
+  var erGameStarted    = false;
+  var erTimeLeft       = 20 * 60;
+  var erTimerInterval;
+  var erCompletedRooms = 0;
+  var erScore          = 0;
+  var erPlayerName     = 'Jugador';
+  var erAnswers        = { 1:Array(5).fill(null), 2:Array(5).fill(null), 3:Array(5).fill(null), 4:Array(5).fill(null), 5:Array(5).fill(null) };
+
+  var erRooms = {
+    1: { id:1, title:'Sala 1: Matemáticas', color:'amber', icon:'calculator',
+      questions:[
+        { question:'¿Cuánto es (3 × 4) + 5 - 2?', options:['12','13','14','15'], answer:3, answerText:'15', explanation:'3×4=12, +5=17, -2=15' },
+        { question:'¿Cuánto es (8 ÷ 2) × 3 + 4?', options:['12','14','16','18'], answer:2, answerText:'16', explanation:'8÷2=4, ×3=12, +4=16' },
+        { question:'¿Cuánto es (10 - 3) × 2 + 5?', options:['17','18','19','20'], answer:2, answerText:'19', explanation:'10-3=7, ×2=14, +5=19' },
+        { question:'¿Cuánto es (6 + 4) × (5 - 2)?', options:['20','25','30','35'], answer:2, answerText:'30', explanation:'6+4=10, 5-2=3, 10×3=30' },
+        { question:'¿Cuánto es (9 × 2) - (8 ÷ 4) + 3?', options:['18','19','20','21'], answer:1, answerText:'19', explanation:'9×2=18, 8÷4=2, 18-2=16, +3=19' }
+      ]},
+    2: { id:2, title:'Sala 2: Redes', color:'emerald', icon:'network-wired',
+      questions:[
+        { question:"¿Qué significa 'Wi-Fi'?", options:['Wireless Fidelity','Wired Fidelity','Wireless Finder','Wired Finder'], answer:0, answerText:'Wireless Fidelity' },
+        { question:'¿Qué dispositivo usas para conectarte a Internet en casa?', options:['Teléfono','Tablet','Router','Televisor'], answer:2, answerText:'Router' },
+        { question:'¿Qué icono representa una conexión inalámbrica?', options:['Un círculo','Un triángulo','Las barras de señal','Un cuadrado'], answer:2, answerText:'Las barras de señal' },
+        { question:'¿Qué cable se usa para red: el USB o el Ethernet?', options:['USB','Ethernet','Ambos','Ninguno'], answer:1, answerText:'Ethernet' },
+        { question:'¿Qué se usa para Internet en el móvil sin Wi-Fi?', options:['Datos móviles','Bluetooth','GPS','NFC'], answer:0, answerText:'Datos móviles' }
+      ]},
+    3: { id:3, title:'Sala 3: Proyectos', color:'purple', icon:'tasks',
+      questions:[
+        { question:'¿Cómo se llama una lista de tareas?', options:['Agenda','Calendario','To-do list','Inventario'], answer:2, answerText:'To-do list' },
+        { question:'¿Cómo se llama el objetivo principal de un proyecto?', options:['Tarea','Meta','Recurso','Herramienta'], answer:1, answerText:'Meta' },
+        { question:'¿Qué se usa para organizar el trabajo: agenda o calendario?', options:['Agenda','Calendario','Ambos','Ninguno'], answer:1, answerText:'Calendario' },
+        { question:"¿Qué es un 'equipo' en un proyecto?", options:['Un ordenador','Una herramienta','Personas que trabajan juntas','Una sala de reuniones'], answer:2, answerText:'Personas que trabajan juntas' },
+        { question:"¿Qué palabra significa 'finalizar un proyecto'?", options:['Iniciar','Completar','Suspender','Planificar'], answer:1, answerText:'Completar' }
+      ]},
+    4: { id:4, title:'Sala 4: Historia', color:'rose', icon:'landmark',
+      questions:[
+        { question:'¿Quién descubrió América?', options:['Cristóbal Colón','Magallanes','Vasco da Gama','Marco Polo'], answer:0, answerText:'Cristóbal Colón' },
+        { question:'¿En qué continente está Egipto?', options:['Europa','Asia','África','América'], answer:2, answerText:'África' },
+        { question:'¿Qué imperio construyó los caminos incas?', options:['Inca','Azteca','Maya','Romano'], answer:0, answerText:'Inca' },
+        { question:'¿Dónde se inventó la escritura?', options:['Mesopotamia','Egipto','China','India'], answer:0, answerText:'Mesopotamia' },
+        { question:'¿Qué civilización construyó la Gran Muralla?', options:['China','India','Persia','Roma'], answer:0, answerText:'China' }
+      ]},
+    5: { id:5, title:'Sala 5: Equipos', color:'blue', icon:'laptop-code',
+      questions:[
+        { question:'¿Qué parte del ordenador se usa para escribir?', options:['Monitor','Teclado','Ratón','CPU'], answer:1, answerText:'Teclado' },
+        { question:'¿Qué dispositivo muestra imágenes?', options:['Monitor','Teclado','Altavoz','Impresora'], answer:0, answerText:'Monitor' },
+        { question:'¿Qué dispositivo se usa para hacer clic?', options:['Monitor','Teclado','Ratón','CPU'], answer:2, answerText:'Ratón' },
+        { question:'¿Qué guarda información en el ordenador?', options:['Disco duro','Monitor','Teclado','Ratón'], answer:0, answerText:'Disco duro' },
+        { question:'¿Qué envía documentos a papel?', options:['Monitor','Teclado','Altavoz','Impresora'], answer:3, answerText:'Impresora' }
+      ]}
+  };
+
+  var erScreens = {
+    start:  document.getElementById('er-start-screen'),
+    levels: document.getElementById('er-levels-screen'),
+    room:   document.getElementById('er-room-screen'),
+    final:  document.getElementById('er-final-screen')
+  };
+
+  function erShowScreen(name) {
+    Object.values(erScreens).forEach(function (s) { s.style.display = 'none'; });
+    erScreens[name].style.display = 'block';
+    if (name === 'levels') { erUpdateRoomsUI(); erUpdateProgress(); }
+  }
+
+  /* Listeners ER */
+  document.getElementById('er-start-button').addEventListener('click', erStartGame);
+  document.getElementById('er-back-to-start').addEventListener('click', function () { erShowScreen('start'); });
+  document.getElementById('er-back-to-rooms').addEventListener('click', function () { erShowScreen('levels'); });
+  document.getElementById('er-submit-room').addEventListener('click', erSubmitRoom);
+  document.getElementById('er-restart-button').addEventListener('click', erRestart);
+  document.getElementById('er-certificate-button').addEventListener('click', erShowCertificate);
+  document.getElementById('er-close-certificate').addEventListener('click', function () { document.getElementById('er-certificate-modal').classList.add('hidden'); });
+  document.getElementById('er-print-certificate').addEventListener('click', erPrint);
+  document.getElementById('er-player-name').addEventListener('input', function () { erPlayerName = this.value || 'Jugador'; });
+  document.getElementById('er-close-result-modal').addEventListener('click', function () {
+    document.getElementById('er-result-modal').classList.add('hidden');
+    erShowScreen('levels');
+  });
+
+  document.querySelectorAll('.er-room-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      erEnterRoom(parseInt(this.getAttribute('data-room')));
+    });
+  });
+
+  function erStartGame() {
+    var n = document.getElementById('er-player-name').value.trim();
+    if (n) erPlayerName = n;
+    erGameStarted = true;
+    document.getElementById('er-header-bar').style.display = 'block';
+    erStartTimer();
+    erShowScreen('levels');
+  }
+
+  function erStartTimer() {
+    erUpdateTimerDisplay();
+    erTimerInterval = setInterval(function () {
+      erTimeLeft--;
+      erUpdateTimerDisplay();
+      if (erTimeLeft <= 0) { clearInterval(erTimerInterval); erEndGame(); }
+    }, 1000);
+  }
+
+  function erUpdateTimerDisplay() {
+    var m = Math.floor(erTimeLeft / 60), s = erTimeLeft % 60;
+    document.getElementById('er-timer').textContent =
+      m.toString().padStart(2,'0') + ':' + s.toString().padStart(2,'0');
+  }
+
+  function erUpdateProgress() {
+    document.getElementById('er-progress-fill').style.width = ((erCompletedRooms / 5) * 100) + '%';
+  }
+
+  function erUpdateRoomsUI() {
+    for (var i = 1; i <= 5; i++) {
+      var el  = document.getElementById('er-room-' + i);
+      var btn = el.querySelector('.er-room-btn');
+      el.classList.remove('completed','locked');
+      if (i <= erCurrentRoom) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-door-open" style="margin-right:.35rem"></i> Entrar';
+        btn.className = 'er-room-btn btn btn-color-' + erRooms[i].color;
+        if (i < erCurrentRoom) el.classList.add('completed');
+      } else {
+        el.classList.add('locked');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-lock" style="margin-right:.35rem"></i> Bloqueada';
+        btn.className = 'er-room-btn btn btn-slate-er';
+      }
+    }
+  }
+
+  function erEnterRoom(id) {
+    erCurrentRoom = id;
+    erRenderQuestions(id);
+    erShowScreen('room');
+  }
+
+  function erRenderQuestions(roomId) {
+    var room    = erRooms[roomId];
+    var content = document.getElementById('er-room-content');
+    var html    = '<div style="text-align:center;margin-bottom:2rem">'
+      + '<div class="room-card-icon icon-bg-' + room.color + '" style="margin:0 auto 1rem;font-size:1.5rem"><i class="fas fa-' + room.icon + '"></i></div>'
+      + '<h3 class="text-color-' + room.color + '" style="font-size:1.5rem;font-weight:700;margin-bottom:.5rem">' + room.title + '</h3>'
+      + '<p style="font-size:1.05rem">Responde todas las preguntas para completar la sala</p></div>';
+
+    room.questions.forEach(function (q, idx) {
+      var ans  = erAnswers[roomId][idx];
+      var isOk = (ans === q.answer);
+      var cls  = ans !== null ? ('question-card ' + (isOk ? 'correct' : 'incorrect')) : 'question-card';
+      var badge = ans === null ? '<span class="q-badge q-badge-pending">Sin responder</span>'
+        : (isOk ? '<span class="q-badge q-badge-correct">✓ Correcta</span>'
+                : '<span class="q-badge q-badge-incorrect">✗ Incorrecta</span>');
+
+      html += '<div class="' + cls + '"><div class="question-top"><h4>Pregunta ' + (idx+1) + '</h4>' + badge + '</div>'
+        + '<p class="question-text">' + q.question + '</p><div class="options-grid">';
+
+      q.options.forEach(function (opt, oi) {
+        var sel = (ans === oi);
+        var bx  = 'option-box' + (sel ? (isOk ? ' option-correct' : ' option-wrong') : '');
+        html += '<label class="option-label"><div class="' + bx + '">'
+          + '<input type="radio" name="erq-' + roomId + '-' + idx + '" value="' + oi + '"'
+          + (sel ? ' checked' : '') + (ans !== null ? ' disabled' : '')
+          + ' onchange="erSelectAnswer(' + roomId + ',' + idx + ',' + oi + ')">'
+          + opt + '</div></label>';
+      });
+
+      html += '</div>';
+      if (ans !== null && !isOk) {
+        html += '<div class="explanation-box expl-' + room.color + '">'
+          + '<p class="expl-title">Respuesta correcta: ' + q.answerText + '</p>'
+          + '<p class="expl-body">' + (q.explanation || '') + '</p></div>';
+      }
+      html += '</div>';
+    });
+
+    content.innerHTML = html;
+    document.getElementById('er-current-room-title').textContent = room.title;
+    var answered = erAnswers[roomId].filter(function (a) { return a !== null; }).length;
+    document.getElementById('er-questions-count').textContent = answered + '/5';
+    document.getElementById('er-submit-room').disabled = (answered === 0);
+  }
+
+  window.erSelectAnswer = function (roomId, qIdx, optIdx) {
+    erAnswers[roomId][qIdx] = optIdx;
+    var answered = erAnswers[roomId].filter(function (a) { return a !== null; }).length;
+    document.getElementById('er-questions-count').textContent = answered + '/5';
+    document.getElementById('er-submit-room').disabled = false;
+    erRenderQuestions(roomId);
+  };
+
+  function erSubmitRoom() {
+    var room    = erRooms[erCurrentRoom];
+    var correct = 0;
+    erAnswers[erCurrentRoom].forEach(function (ans, i) {
+      if (ans === room.questions[i].answer) correct++;
+    });
+    var passed = correct >= 4;
+    erShowResultModal(passed, correct);
+    if (passed && erCurrentRoom === erCompletedRooms + 1) {
+      erCompletedRooms++;
+      erScore += correct * 4;
+      if (erCurrentRoom < 5) erCurrentRoom++;
+    }
+    if (erCompletedRooms === 5) setTimeout(function () { erEndGame(); }, 1500);
+    erUpdateProgress();
+  }
+
+  function erShowResultModal(passed, correct) {
+    document.getElementById('er-result-icon').innerHTML = passed
+      ? '<i class="fas fa-check-circle" style="color:var(--success)"></i>'
+      : '<i class="fas fa-times-circle" style="color:var(--danger)"></i>';
+    var title = document.getElementById('er-result-title');
+    title.textContent = passed ? '¡Sala Completada!' : 'Sala No Superada';
+    title.style.color = passed ? 'var(--green-400)' : 'var(--red-400)';
+    document.getElementById('er-result-message').textContent = passed
+      ? 'Has acertado ' + correct + ' de 5. ¡Puedes continuar!'
+      : 'Solo acertaste ' + correct + ' de 5. Necesitas al menos 4. Inténtalo de nuevo.';
+    document.getElementById('er-result-modal').classList.remove('hidden');
+  }
+
+  function erEndGame() {
+    clearInterval(erTimerInterval);
+    var used = 20 * 60 - erTimeLeft;
+    document.getElementById('er-final-time').textContent  = Math.floor(used/60).toString().padStart(2,'0') + ':' + (used%60).toString().padStart(2,'0');
+    document.getElementById('er-final-score').textContent = erScore + '/100';
+    document.getElementById('er-final-rooms').textContent = erCompletedRooms + '/5';
+    erShowScreen('final');
+  }
+
+  function erRestart() {
+    erCurrentRoom = 1; erGameStarted = false; erTimeLeft = 20*60;
+    erCompletedRooms = 0; erScore = 0;
+    erAnswers = { 1:Array(5).fill(null), 2:Array(5).fill(null), 3:Array(5).fill(null), 4:Array(5).fill(null), 5:Array(5).fill(null) };
+    clearInterval(erTimerInterval);
+    document.getElementById('er-header-bar').style.display = 'none';
+    erUpdateTimerDisplay(); erUpdateProgress();
+    erShowScreen('start');
+  }
+
+  function erShowCertificate() {
+    document.getElementById('er-certificate-name').textContent = erPlayerName;
+    document.getElementById('er-certificate-date').textContent = new Date().toLocaleDateString('es-ES', { year:'numeric', month:'long', day:'numeric' });
+    document.getElementById('er-certificate-modal').classList.remove('hidden');
+  }
+
+  function erPrint() {
+    var c = document.getElementById('er-certificate-modal').innerHTML;
+    var o = document.body.innerHTML;
+    document.body.innerHTML = c;
+    window.print();
+    document.body.innerHTML = o;
+    location.reload();
+  }
+});
+</script>
+</body>
+</html>
